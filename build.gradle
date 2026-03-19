@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        classpath(classpath "net.serenity-bdd:serenity-single-page-report:5.3.5")
+    }
+}
+plugins {
+    id 'java'
+    id 'idea'
+    id("net.serenity-bdd.serenity-gradle-plugin") version "5.3.5"
+}
+
+group = 'org.qaconf'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+ext {
+    serenityCoreVersion = '5.3.5'
+    junitVersion = '5.10.0'
+    junitPlatformVersion = '1.10.0'
+    seleniumVersion = '4.41.0'
+    restAssuredVersion = '6.0.0'
+    appiumVersion = '10.0.0'
+}
+
+dependencies {
+    // JUnit
+    testImplementation platform("org.junit:junit-bom:${junitVersion}")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testRuntimeOnly "org.slf4j:slf4j-simple:2.0.17"
+
+    // Serenity
+    implementation "net.serenity-bdd:serenity-core:${serenityCoreVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay:${serenityCoreVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:${serenityCoreVersion}"
+    testImplementation "net.serenity-bdd:serenity-junit5:${serenityCoreVersion}"
+    testImplementation "net.serenity-bdd:serenity-ensure:${serenityCoreVersion}"
+
+    // (Opcional) Selenium — solo si quieres fijar versión exacta
+    implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+
+
+    // RestAssured
+    implementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+
+    // Appium
+    implementation "io.appium:java-client:${appiumVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+serenity {
+    reports = ["single-page-html"]
+}
+
+test.finalizedBy(aggregate)
