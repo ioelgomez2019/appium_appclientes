@@ -6,6 +6,7 @@ buildscript {
         classpath(classpath "net.serenity-bdd:serenity-single-page-report:5.3.5")
     }
 }
+
 plugins {
     id 'java'
     id 'idea'
@@ -18,19 +19,23 @@ version = '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+
 ext {
     serenityCoreVersion = '5.3.5'
     junitVersion = '5.10.0'
     junitPlatformVersion = '1.10.0'
+    cucumberVersion = '7.18.1'
     seleniumVersion = '4.41.0'
     restAssuredVersion = '6.0.0'
     appiumVersion = '10.0.0'
+    mssqlVersion = '12.8.1.jre11'
 }
 
 dependencies {
     // JUnit
     testImplementation platform("org.junit:junit-bom:${junitVersion}")
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation "org.junit.platform:junit-platform-suite:${junitPlatformVersion}"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
     testRuntimeOnly "org.slf4j:slf4j-simple:2.0.17"
 
@@ -41,19 +46,27 @@ dependencies {
     testImplementation "net.serenity-bdd:serenity-junit5:${serenityCoreVersion}"
     testImplementation "net.serenity-bdd:serenity-ensure:${serenityCoreVersion}"
 
-    // (Opcional) Selenium — solo si quieres fijar versión exacta
+    // Selenium
     implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
 
+    // Cucumber
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-picocontainer:${cucumberVersion}"
+    testRuntimeOnly "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
 
     // RestAssured
     implementation "io.rest-assured:rest-assured:${restAssuredVersion}"
 
     // Appium
     implementation "io.appium:java-client:${appiumVersion}"
+
+    // Database
+    implementation "com.microsoft.sqlserver:mssql-jdbc:${mssqlVersion}"
 }
 
 test {
     useJUnitPlatform()
+    systemProperty "cucumber.junit-platform.naming-strategy", "long"
 }
 
 serenity {
@@ -61,3 +74,8 @@ serenity {
 }
 
 test.finalizedBy(aggregate)
+
+tasks.register('runCucumber', Test) {
+    useJUnitPlatform()
+    include '**/TestRunner.class', '**/LoginRunner.class'
+}
